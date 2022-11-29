@@ -1,7 +1,7 @@
 Source: openjpeg2
 Priority: optional
-Maintainer: Deepin Developer <deepin-dev@deepin.org>
-Uploaders: Deepin Packages Builder <packages@deepin.org>
+Maintainer: Debian PhotoTools Maintainers <pkg-phototools-devel@lists.alioth.debian.org>
+Uploaders: Mathieu Malaterre <malat@debian.org>, Hugo Lefeuvre <hle@debian.org>
 Homepage: https://www.openjpeg.org
 Build-Depends: cmake (>= 2.8.2),
                debhelper-compat (= 12),
@@ -14,14 +14,15 @@ Build-Depends: cmake (>= 2.8.2),
                libtiff-dev,
                zlib1g-dev
 Build-Depends-Indep: default-jdk, javahelper (>= 0.37~), libxerces2-java
-Standards-Version: 4.5.1
+Standards-Version: 4.6.1
 Section: libs
-#Vcs-Browser
-#Vcs-Git
+Vcs-Browser: https://salsa.debian.org/debian-phototools-team/openjpeg2
+Vcs-Git: https://salsa.debian.org/debian-phototools-team/openjpeg2.git
 
 Package: libopenjp2-7-dev
 Section: libdevel
 Architecture: any
+Multi-Arch: same
 Depends: libopenjp2-7 (= ${binary:Version}), ${misc:Depends}
 Description: development files for OpenJPEG, a JPEG 2000 image library
  OpenJPEG is a library for handling the JPEG 2000 image compression format.
@@ -46,6 +47,19 @@ Description: JPEG 2000 image compression/decompression library
  .
  This package contains the runtime files for openjpeg 2.x
 
+Package: openjpeg-doc
+Architecture: all
+Section: doc
+Depends: doc-base, ${misc:Depends}
+Description: JPEG 2000 image compression/decompression library
+ OpenJPEG is a library for handling the JPEG 2000 image compression format.
+ JPEG 2000 is a wavelet-based image compression standard and permits progressive
+ transmission by pixel and resolution accuracy for progressive downloads of an
+ encoded image. It supports lossless and lossy compression, supports higher
+ compression than JPEG 1991, and has resilience to errors in the image.
+ .
+ This package installs the documentation files.
+
 Package: libopenjpip7
 Architecture: any
 Multi-Arch: same
@@ -59,20 +73,6 @@ Description: JPEG 2000 Interactive Protocol
  compression than JPEG 1991, and has resilience to errors in the image.
  .
  This is an implementation of the JPEG 2000 Interactive Protocol (Part-9)
-
-Package: libopenjp3d7
-Architecture: any
-Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: JP3D (JPEG 2000 / Part 10) image compression/decompression library
- OpenJPEG is a library for handling the JPEG 2000 image compression format.
- JPEG 2000 is a wavelet-based image compression standard and permits progressive
- transmission by pixel and resolution accuracy for progressive downloads of an
- encoded image. It supports lossless and lossy compression, supports higher
- compression than JPEG 1991, and has resilience to errors in the image.
- .
- This is an implementation of the JPEG 2000 (JP3D) volumetric imaging (Part-10)
 
 Package: libopenjpip-dec-server
 Section: graphics
@@ -124,20 +124,6 @@ Description: JPIP server for JPEG 2000 files
   - Indexing JPEG 2000 files
   - Embedding XML formatted metadata
   - Region Of Interest (ROI) requests
-
-Package: libopenjp3d-tools
-Section: graphics
-Architecture: any
-Multi-Arch: foreign
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Suggests: libopenjp2-tools
-Description: command-line tools using the JPEG 2000 - 3D library
- This package provides with command-line tools allowing for conversions between
- several formats and also provides tools for encoding and decoding
- jpeg 3D formats:
- .
-  - opj_jp3d_compress: compress into JP3D volume
-  - opj_jp3d_decompress: decompress JP3D volume
 
 Package: libopenjp2-tools
 Section: graphics
