@@ -50,9 +50,6 @@ pkg_srv = libopenjpip-server
 pkg_vwr = libopenjpip-viewer
 pkg_dsrv = libopenjpip-dec-server
 
-override_dh_install-indep:
-	dh_install -p$(pkg_doc) debian/tmp/usr/share/doc
-
 override_dh_install-arch:
 	# annoying cmake-fatal-error export stuff:
 	sed -i -e "s/FATAL_ERROR/STATUS/g" debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/openjpeg-2.5/OpenJPEGTargets*.cmake
