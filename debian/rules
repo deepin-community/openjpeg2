@@ -6,10 +6,6 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 # as per upstream request:
 export DEB_CFLAGS_MAINT_APPEND = -fvisibility=hidden
 
-ifeq ($(shell dpkg-vendor --is Ubuntu && echo yes) $(DEB_HOST_ARCH), yes i386)
-   BUILD_PACKAGES += -Nlibopenjpip-server
-endif
-
 # deduce documentation option (build-indep target)
 ifeq "" "$(filter %-doc,$(shell dh_listpackages))"
   BUILDDOC = OFF
@@ -17,8 +13,12 @@ else
   BUILDDOC = ON
 endif
 
+ifeq (,$(filter pkg.openjpeg2.noapache,$(DEB_BUILD_PROFILES)))
+DH_APACHE=--with=apache2
+endif
+
 %:
-	dh $@ --with apache2 $(DH_ADDONS) $(BUILD_PACKAGES)
+	dh $@ $(DH_APACHE) $(DH_ADDONS)
 build binary %-indep: DH_ADDONS=--with=javahelper
 
 CMAKE_EXTRA_FLAGS += -DCMAKE_SKIP_RPATH=ON \
@@ -26,7 +26,7 @@ CMAKE_EXTRA_FLAGS += -DCMAKE_SKIP_RPATH=ON \
   -DOPENJPEG_INSTALL_LIB_DIR:STRING=lib/$(DEB_HOST_MULTIARCH) \
   -DBUILD_CODEC:BOOL=ON \
   -DBUILD_JPIP:BOOL=ON \
-  -DBUILD_JPIP_SERVER:BOOL=ON \
+  -DBUILD_JPIP_SERVER:BOOL=OFF \
   -DBUILD_JPWL:BOOL=OFF \
   -DBUILD_JAVA:BOOL=OFF \
   -DBUILD_MJ2:BOOL=OFF \
@@ -46,13 +46,12 @@ pkg_dev = libopenjp2-$(SOVERSION)-dev
 pkg_doc = openjpeg-doc
 pkg_bin = libopenjp2-tools
 pkg_jpip = libopenjpip$(SOVERSION)
-pkg_srv = libopenjpip-server
 pkg_vwr = libopenjpip-viewer
 pkg_dsrv = libopenjpip-dec-server
 
 override_dh_install-arch:
 	# annoying cmake-fatal-error export stuff:
-	sed -i -e "s/FATAL_ERROR/STATUS/g" debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/openjpeg-2.5/OpenJPEGTargets*.cmake
+	sed -i -e "s/FATAL_ERROR/STATUS/g" debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/openjpeg-2.5/OpenJPEGTargets*.cmake
 	# install opj_dump/compress/decompress:
 	dh_install -p$(pkg_bin) --autodest -Xserver -Xjpip usr/bin/*
 	dh_install -p$(pkg_bin) --autodest -Xserver -Xjpip usr/share/man/man1/*.1
@@ -63,43 +62,46 @@ override_dh_install-arch:
 	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/libopenjp2.so
 	# Do not install .so symblink for now:
 	#dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/libopenjpip.so
-	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/libopenjpip_server.a
-	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/openjpeg-2.5/*.cmake
+	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/cmake/openjpeg-2.5/*.cmake
 	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/*.pc
 	dh_install -p$(pkg_dev) --autodest usr/include/openjpeg-2.5
 	dh_install -p$(pkg_dev) --autodest usr/share/man/man3/libopenjp2.3
+	dh_install -p$(pkg_dev) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/libopenjpip.so
 	# accept hardcoded path to 2.1 (2.5 kept the same SONAME):
 	dh_link -p$(pkg_dev) usr/lib/$(DEB_HOST_MULTIARCH)/openjpeg-2.5 usr/lib/$(DEB_HOST_MULTIARCH)/openjpeg-2.1
 	dh_link -p$(pkg_dev) usr/include/openjpeg-2.5 usr/include/openjpeg-2.1
 	# libjpip:
 	dh_install -p$(pkg_jpip) --autodest usr/lib/$(DEB_HOST_MULTIARCH)/libopenjpip.so.*
-	# server:
-	dh_install -p$(pkg_srv) --autodest usr/bin/opj_server
 	# dec-server
 	dh_install -p$(pkg_dsrv) --autodest usr/bin/opj_dec_server
 	dh_install -p$(pkg_dsrv) --autodest usr/bin/opj_jpip*
 	dh_install
 
-CURVER := $(shell dpkg-parsechangelog | grep ^Version | awk '{print $$2}' | cut -d- -f1 | cut -d+ -f1)
+include /usr/share/dpkg/default.mk
 
 # create man pages:
 export LD_LIBRARY_PATH := $(CURDIR)/debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/:$(LD_LIBRARY_PATH)
 export PATH := $(CURDIR)/debian/tmp/usr/bin:$(PATH)
 
-VER_FULL = $(shell dpkg-parsechangelog -Sversion | cut -d - -f 1)
+include /usr/share/dpkg/default.mk
 
 debian/%.1: debian/opj_common.1.in
 	help2man --include=$< --output=$@ --name="Works with JPEG2000 files" \
-		--no-info --no-discard-stderr `basename $@ .1` --help-option=-h --version-string=$(VER_FULL)
+		--no-info --no-discard-stderr `basename $@ .1` --help-option=-h --version-string=$(DEB_VERSION_UPSTREAM)
 
 opj_manpages: debian/opj_jpip_addxml.1 debian/opj_jpip_test.1 debian/opj_jpip_transcode.1
 	echo "all missing man pages done"
 
 # never returns:
-# debian/opj_dec_server.1 debian/opj_server.1 debian/opj_jpip_viewer.1
+# debian/opj_dec_server.1 debian/opj_jpip_viewer.1
 
 override_dh_installman: opj_manpages
 	dh_installman -p$(pkg_dsrv) debian/opj_jpip_*.1
-	#dh_installman -p$(pkg_srv) debian/opj_server.1
 	#dh_installman -p$(pkg_vwr) debian/opj_dec_server.1
 	#dh_installman
+
+# I don't find it *trivial* to build and install -arch or -indep files. E.g.
+# open opj_jpip_viewer.jar is to be installed in an _all package, while it
+# needs to be built along with the C library.
+override_dh_missing-indep:
+	dh_missing -i --list-missing
