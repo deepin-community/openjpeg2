@@ -728,7 +728,7 @@ static int parse_cmdline_encoder(int argc, char **argv,
         /* ----------------------------------------------------- */
 
 
-        case 'r': {         /* rates rates/distorsion */
+        case 'r': {         /* rates rates/distortion */
             char *s = opj_optarg;
             parameters->tcp_numlayers = 0;
             while (sscanf(s, "%f", &parameters->tcp_rates[parameters->tcp_numlayers]) ==
@@ -846,7 +846,7 @@ static int parse_cmdline_encoder(int argc, char **argv,
 
         /* ----------------------------------------------------- */
 
-        case 'q': {         /* add fixed_quality */
+        case 'q': {         /* layer allocation by distortion ratio (PSNR) */
             char *s = opj_optarg;
             while (sscanf(s, "%f", &parameters->tcp_distoratio[parameters->tcp_numlayers])
                     == 1) {
@@ -866,7 +866,7 @@ static int parse_cmdline_encoder(int argc, char **argv,
         /* dda */
         /* ----------------------------------------------------- */
 
-        case 'f': {         /* mod fixed_quality (before : -q) */
+        case 'f': {         /* layer allocation by fixed layer */
             int *row = NULL, *col = NULL;
             OPJ_UINT32 numlayers = 0, numresolution = 0, matrix_width = 0;
 
@@ -1812,7 +1812,7 @@ static int parse_cmdline_encoder(int argc, char **argv,
                   parameters->cp_fixed_quality))) {
         fprintf(stderr, "[ERROR] options -r -q and -f cannot be used together !!\n");
         return 1;
-    }               /* mod fixed_quality */
+    }
 
 
     /* if no rate entered, lossless by default */
@@ -1883,7 +1883,7 @@ static void info_callback(const char *msg, void *client_data)
     fprintf(stdout, "[INFO] %s", msg);
 }
 
-OPJ_FLOAT64 opj_clock(void)
+static OPJ_FLOAT64 opj_clock(void)
 {
 #ifdef _WIN32
     /* _WIN32: use QueryPerformance (very accurate) */
@@ -2249,6 +2249,9 @@ int main(int argc, char **argv)
         /* open a byte stream for writing and allocate memory for all tiles */
         l_stream = opj_stream_create_default_file_stream(parameters.outfile, OPJ_FALSE);
         if (! l_stream) {
+            fprintf(stderr, "cannot create %s\n", parameters.outfile);
+            opj_destroy_codec(l_codec);
+            opj_image_destroy(image);
             ret = 1;
             goto fin;
         }
@@ -2263,6 +2266,9 @@ int main(int argc, char **argv)
             OPJ_UINT32 l_data_size = 512 * 512 * 3;
             l_data = (OPJ_BYTE*) calloc(1, l_data_size);
             if (l_data == NULL) {
+                opj_stream_destroy(l_stream);
+                opj_destroy_codec(l_codec);
+                opj_image_destroy(image);
                 ret = 1;
                 goto fin;
             }

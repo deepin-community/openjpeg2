@@ -1,3 +1,56 @@
+openjpeg2 (2.5.3-2.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * CVE-2025-54874: Out-of-bounds write in opj_jp2_read_header()
+    (Closes: #1110443)
+
+ -- Adrian Bunk <bunk@debian.org>  Sat, 09 Aug 2025 18:19:52 +0300
+
+openjpeg2 (2.5.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * Drop libopenjpip-server to make libfcgi a non-key pkg, see: #1092774.
+
+ -- Bastian Germann <bage@debian.org>  Mon, 10 Mar 2025 08:22:54 +0100
+
+openjpeg2 (2.5.3-1) unstable; urgency=medium
+
+  * Team upload.
+  * No-change rebuild for unstable.
+
+ -- Santiago Ruano Rincón <santiagorr@riseup.net>  Fri, 31 Jan 2025 15:25:25 -0300
+
+openjpeg2 (2.5.3-1~exp2) experimental; urgency=medium
+
+  * Team upload.
+  * Move doxygen from Build-Dep to Build-Depends-Indep
+  * Override dh_missing to make it list the missing files
+
+ -- Santiago Ruano Rincón <santiagorr@riseup.net>  Tue, 28 Jan 2025 16:53:29 -0300
+
+openjpeg2 (2.5.3-1~exp1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ Andreas Tille ]
+  * New upstream version
+    Closes: #1089596
+  * Standards-Version: 4.7.0 (routine-update)
+  * debhelper-compat 13 (routine-update)
+  * d/rules: Do not parse d/changelog
+  * Do not parse d/changelog (routine-update)
+  * Rules-Requires-Root: no (routine-update)
+  * watch file standard 4 (routine-update)
+  * Solve openjpeg / apache build-dep loop
+    Closes: #1055436
+
+  [ Santiago Ruano Rincón ]
+  * Add doxygen as Build-Dep
+  * Install doc related files in openjpeg-doc
+  * Update d/copyright
+
+ -- Santiago Ruano Rincón <santiagorr@riseup.net>  Mon, 27 Jan 2025 15:05:10 -0300
+
 openjpeg2 (2.5.0-2) unstable; urgency=medium
 
   * Team upload.
