@@ -1,3 +1,16 @@
+openjpeg2 (2.5.3-2.1~deb13u2) trixie-security; urgency=medium
+
+  * CVE-2026-6192 (Closes: #1133832)
+
+ -- Moritz Mühlenhoff <jmm@debian.org>  Tue, 12 May 2026 15:10:49 +0200
+
+openjpeg2 (2.5.3-2.1~deb13u1) trixie; urgency=medium
+
+  * Non-maintainer upload.
+  * Rebuild for trixie.
+
+ -- Adrian Bunk <bunk@debian.org>  Sun, 17 Aug 2025 18:30:07 +0300
+
 openjpeg2 (2.5.3-2.1) unstable; urgency=medium
 
   * Non-maintainer upload.
