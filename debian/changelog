@@ -1,3 +1,9 @@
+openjpeg2 (2.5.3-2.1deepin1~deb13u3) unstable; urgency=medium
+
+  * Rebuild with LTO enabled (dpkg vendor feature optimize/lto).
+
+ -- tunaichao <tunaichao@uniontech.com>  Thu, 10 Sep 2026 19:55:30 +0800
+
 openjpeg2 (2.5.3-2.1deepin1~deb13u2) unstable; urgency=medium
 
   * update changelog
